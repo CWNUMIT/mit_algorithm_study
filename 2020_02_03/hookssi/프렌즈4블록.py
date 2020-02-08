@@ -2,37 +2,45 @@
 # 2. 오른쪽 대각선 블록 확인
 # 3. 오른쪽, 아래 블록 확인
 
-# 옆으로 생각해서 스택형식으로 만드는 것도...
+def update_block(n, board):
+    result = 0
+    count = 0
+    
+    for x in range(0, n - 1):
+        for y in range(0, len(board[x]) - 1):
+            if(len(board[x + 1]) >= (len(board[x]) - y)):
+                check_valid(x, y, board)
 
-def update_block(m, n, board):
-    for y in range(0, m - 1):
-        for x in range(0, n - 1):
-            check_valid(x, y, board)
+    for x in range(0, n):
+        count += len(list(filter(lambda x: x[1], board[x])))
+        board[x] = list(filter(lambda x: not x[1], board[x]))
+    result += count
     
-    for y in range(0, m):
-        for x in range(0, n):
-            if(board[y][x][1]):
-                board[y][x][0] = 0
-    
-    print(board)
+    if(count > 0):
+        return result + update_block(n, board)
+    return result
+        
 def check_valid(x, y, board):
-    block = board[y][x][0]
+    block = board[x][y][0]
     
-    if(board[y + 1][x + 1][0] == block and board[y][x + 1][0] == block and board[y + 1][x][0] == block):
-        board[y + 1][x + 1][1] = True
-        board[y][x + 1][1] = True
-        board[y + 1][x][1] = True
-        board[y][x][1] = True
+    correction_pos = len(board[x+1]) - len(board[x])
+    
+    if(board[x + 1][y + correction_pos + 1][0] == block and board[x][y + 1][0] == block and board[x + 1][y + correction_pos][0] == block):
+        board[x + 1][y + correction_pos + 1][1] = True
+        board[x][y + 1][1] = True
+        board[x + 1][y + correction_pos][1] = True
+        board[x][y][1] = True
 
 def Init(m, n, board):
-    for y in range(0, m):
-        for x in range(0, n):
-            board[y] = list(board[y])
-            board[y][x] = [board[y][x], False]
+    newBoard = list()
+    
+    for x in range(0, n):
+        newBoard.append(list( [board[y][x],False] for y in range(0, m) ))
+    return newBoard
 
 def solution(m, n, board):
-    Init(m, n, board)
-    update_block(m, n, board)
+    print(m, n)
+    board = Init(m, n, board)
     
-    answer = 0
+    answer = update_block(n, board)
     return answer
